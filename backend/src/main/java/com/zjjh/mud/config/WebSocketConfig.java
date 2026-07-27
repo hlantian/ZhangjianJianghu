@@ -1,6 +1,8 @@
 package com.zjjh.mud.config;
 
+import com.zjjh.mud.websocket.CustomHandshakeHandler;
 import com.zjjh.mud.websocket.GameWebSocketAuthInterceptor;
+import com.zjjh.mud.websocket.WebSocketHandshakeInterceptor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
@@ -15,20 +17,21 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     private final GameWebSocketAuthInterceptor authInterceptor;
+    private final WebSocketHandshakeInterceptor handshakeInterceptor;
+    private final CustomHandshakeHandler customHandshakeHandler;
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        // 服务端推送消息的前缀
         config.enableSimpleBroker("/topic", "/queue");
-        // 客户端发送消息的前缀
         config.setApplicationDestinationPrefixes("/app");
-        // 给指定用户推送消息的前缀
         config.setUserDestinationPrefix("/user");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws")
+                .addInterceptors(handshakeInterceptor)
+                .setHandshakeHandler(customHandshakeHandler)
                 .setAllowedOriginPatterns("*")
                 .withSockJS();
     }

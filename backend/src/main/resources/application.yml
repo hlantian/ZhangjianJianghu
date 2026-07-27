@@ -54,6 +54,8 @@ jwt:
 
 # 游戏配置
 game:
+  # 原始数据路径(用于数据迁移)
+  data-path: e:/ZhangjianJianghu/home/mud/data
   # 房间内移动坐标范围
   min-x: 10
   max-x: 365

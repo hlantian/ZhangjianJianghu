@@ -1,6 +1,5 @@
 import SockJS from 'sockjs-client'
-import Stomp from 'stomp-websocket'
-import { useAuthStore } from '@/stores/auth'
+import { Client } from '@stomp/stompjs'
 
 interface Callbacks {
   onMessage?: (msg: any) => void
@@ -10,32 +9,40 @@ interface Callbacks {
 }
 
 class GameWebSocket {
-  private stompClient: any = null
+  private stompClient: Client | null = null
   private connected = false
   private callbacks: Callbacks = {}
   private reconnectTimer: any = null
+  private subscriptions: any[] = []
 
   connect(token: string, callbacks: Callbacks) {
     this.callbacks = callbacks
 
-    const socket = new SockJS('/ws')
-    this.stompClient = Stomp.over(socket)
+    const socket = new SockJS('/ws?token=' + encodeURIComponent(token))
 
-    this.stompClient.connect(
-      { Authorization: `Bearer ${token}` },
-      (frame: any) => {
+    this.stompClient = new Client({
+      webSocketFactory: () => socket as any,
+      connectHeaders: {
+        Authorization: `Bearer ${token}`
+      },
+      onConnect: (frame) => {
         console.log('WebSocket连接成功:', frame)
         this.connected = true
         this.callbacks.onConnect?.()
       },
-      (error: any) => {
-        console.error('WebSocket连接失败:', error)
+      onDisconnect: () => {
+        console.log('WebSocket断开连接')
         this.connected = false
         this.callbacks.onDisconnect?.()
-        // 自动重连
         this.scheduleReconnect(token)
+      },
+      onStompError: (frame) => {
+        console.error('STOMP错误:', frame)
+        this.callbacks.onError?.(frame)
       }
-    )
+    })
+
+    this.stompClient.activate()
   }
 
   private scheduleReconnect(token: string) {
@@ -44,6 +51,7 @@ class GameWebSocket {
     }
     this.reconnectTimer = setTimeout(() => {
       console.log('尝试重新连接...')
+      this.subscriptions = []
       this.connect(token, this.callbacks)
     }, 5000)
   }
@@ -53,10 +61,12 @@ class GameWebSocket {
       clearTimeout(this.reconnectTimer)
       this.reconnectTimer = null
     }
+    this.subscriptions.forEach(sub => {
+      try { sub.unsubscribe() } catch (e) { /* ignore */ }
+    })
+    this.subscriptions = []
     if (this.stompClient && this.connected) {
-      this.stompClient.disconnect(() => {
-        console.log('WebSocket已断开')
-      })
+      this.stompClient.deactivate()
     }
     this.connected = false
   }
@@ -70,7 +80,10 @@ class GameWebSocket {
    */
   sendCommand(command: string) {
     if (this.stompClient && this.connected) {
-      this.stompClient.send('/app/command', {}, JSON.stringify({ command }))
+      this.stompClient.publish({
+        destination: '/app/command',
+        body: JSON.stringify({ command })
+      })
     } else {
       console.warn('WebSocket未连接，无法发送命令')
     }
@@ -81,16 +94,19 @@ class GameWebSocket {
    */
   subscribePlayer(playerId: number) {
     if (this.stompClient && this.connected) {
-      this.stompClient.subscribe(`/user/${playerId}/queue/messages`, (message: any) => {
+      // 订阅私人消息 (通过user destination)
+      const sub1 = this.stompClient.subscribe(`/user/${playerId}/queue/messages`, (message: any) => {
         const msg = JSON.parse(message.body)
         this.callbacks.onMessage?.(msg)
       })
+      this.subscriptions.push(sub1)
 
       // 订阅系统消息
-      this.stompClient.subscribe('/topic/system', (message: any) => {
+      const sub2 = this.stompClient.subscribe('/topic/system', (message: any) => {
         const msg = JSON.parse(message.body)
         this.callbacks.onMessage?.(msg)
       })
+      this.subscriptions.push(sub2)
     }
   }
 
@@ -99,10 +115,11 @@ class GameWebSocket {
    */
   subscribeRoom(roomId: number) {
     if (this.stompClient && this.connected) {
-      this.stompClient.subscribe(`/topic/room/${roomId}`, (message: any) => {
+      const sub = this.stompClient.subscribe(`/topic/room/${roomId}`, (message: any) => {
         const msg = JSON.parse(message.body)
         this.callbacks.onMessage?.(msg)
       })
+      this.subscriptions.push(sub)
     }
   }
 
@@ -111,19 +128,12 @@ class GameWebSocket {
    */
   subscribeChatChannel(channel: string) {
     if (this.stompClient && this.connected) {
-      this.stompClient.subscribe(`/topic/chat/${channel}`, (message: any) => {
+      const sub = this.stompClient.subscribe(`/topic/chat/${channel}`, (message: any) => {
         const msg = JSON.parse(message.body)
         this.callbacks.onMessage?.(msg)
       })
+      this.subscriptions.push(sub)
     }
-  }
-
-  /**
-   * 取消订阅房间
-   */
-  unsubscribeRoom(roomId: number) {
-    // STOMP的subscription可以保存引用后unsubscribe
-    // 简化实现: 重新订阅时会覆盖
   }
 }
 

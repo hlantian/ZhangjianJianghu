@@ -8,10 +8,10 @@ import com.zjjh.mud.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
-import org.springframework.messaging.simp.annotation.SubscribeMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 
@@ -36,13 +36,12 @@ public class GameWebSocketController {
      * 处理玩家命令
      */
     @MessageMapping("/command")
-    public void handleCommand(@Payload Map<String, String> payload, StompHeaderAccessor accessor) {
+    public void handleCommand(@Payload Map<String, String> payload, Principal principal) {
         String command = payload.get("command");
         if (command == null || command.trim().isEmpty()) {
             return;
         }
 
-        Principal principal = accessor.getUser();
         if (principal == null || !(principal instanceof StompPrincipal stompPrincipal)) {
             log.warn("收到命令但未认证: {}", command);
             return;
@@ -60,7 +59,7 @@ public class GameWebSocketController {
             gameEngine.getPlayerManager().playerOnline(player.getId());
         }
 
-        // 更新在线玩家数据
+        // 获取在线玩家数据
         Player onlinePlayer = gameEngine.getPlayerManager().getOnlinePlayer(player.getId());
         if (onlinePlayer == null) {
             onlinePlayer = player;
@@ -78,22 +77,23 @@ public class GameWebSocketController {
      * 玩家订阅房间频道
      */
     @MessageMapping("/subscribe/room")
-    public void subscribeRoom(@Payload Map<String, Object> payload, StompHeaderAccessor accessor) {
-        Principal principal = accessor.getUser();
-        if (principal instanceof StompPrincipal stompPrincipal) {
-            Player player = authService.getPlayerByUserId(stompPrincipal.getUserId());
-            if (player != null && player.getRoomId() != null) {
-                // 发送当前房间信息
-                String desc = gameEngine.getRoomManager().getRoomDescription(player.getRoomId());
-                gameEngine.getMessageService().sendToPlayer(player.getId(), GameMessage.info(desc));
+    public void subscribeRoom(@Payload Map<String, Object> payload, Principal principal) {
+        if (principal == null || !(principal instanceof StompPrincipal stompPrincipal)) {
+            return;
+        }
 
-                // 发送房间内人物
-                for (var p : gameEngine.getPlayerManager().getOnlinePlayersInRoom(player.getRoomId())) {
-                    if (!p.getId().equals(player.getId())) {
-                        gameEngine.getMessageService().sendActorEnter(
-                                player.getRoomId(), p.getName(), p.getName(),
-                                p.getPlayerX(), p.getPlayerY());
-                    }
+        Player player = authService.getPlayerByUserId(stompPrincipal.getUserId());
+        if (player != null && player.getRoomId() != null) {
+            // 发送当前房间信息
+            String desc = gameEngine.getRoomManager().getRoomDescription(player.getRoomId());
+            gameEngine.getMessageService().sendToPlayer(player.getId(), GameMessage.info(desc));
+
+            // 发送房间内人物
+            for (var p : gameEngine.getPlayerManager().getOnlinePlayersInRoom(player.getRoomId())) {
+                if (!p.getId().equals(player.getId())) {
+                    gameEngine.getMessageService().sendActorEnter(
+                            player.getRoomId(), p.getName(), p.getName(),
+                            p.getPlayerX(), p.getPlayerY());
                 }
             }
         }

@@ -18,6 +18,7 @@ public class Player {
     private String name;
     private String nick;
     private String title;
+    @TableField("`describe`")
     private String describe;
     private String sex;
     private Integer age;

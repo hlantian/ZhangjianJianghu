@@ -8,6 +8,7 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -24,30 +25,51 @@ public class GameWebSocketAuthInterceptor implements ChannelInterceptor {
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
 
         if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+            // 尝试从STOMP头获取Authorization
             List<String> authHeaders = accessor.getNativeHeader("Authorization");
-            if (authHeaders == null || authHeaders.isEmpty()) {
-                log.warn("WebSocket连接缺少认证信息");
-                return null;
+            String token = null;
+
+            if (authHeaders != null && !authHeaders.isEmpty()) {
+                String authHeader = authHeaders.get(0);
+                if (authHeader.startsWith("Bearer ")) {
+                    token = authHeader.substring(7);
+                }
             }
 
-            String authHeader = authHeaders.get(0);
-            if (!authHeader.startsWith("Bearer ")) {
-                log.warn("WebSocket连接认证格式错误");
-                return null;
+            // 如果STOMP头没有，从会话属性获取(HandshakeInterceptor设置的)
+            if (token == null) {
+                @SuppressWarnings("unchecked")
+                java.util.Map<String, Object> sessionAttrs = 
+                    (java.util.Map<String, Object>) accessor.getHeader(
+                        org.springframework.messaging.support.NativeMessageHeaderAccessor.NATIVE_HEADERS);
+                
+                // 从session attributes获取
+                Object principalObj = accessor.getSessionAttributes() != null ? 
+                    accessor.getSessionAttributes().get("principal") : null;
+                if (principalObj instanceof StompPrincipal stompPrincipal) {
+                    accessor.setUser(stompPrincipal);
+                    log.info("WebSocket用户连接(来自握手): userId={}, username={}", 
+                        stompPrincipal.getUserId(), stompPrincipal.getUsername());
+                    return MessageBuilder.createMessage(
+                        message.getPayload(), accessor.getMessageHeaders());
+                }
             }
 
-            String token = authHeader.substring(7);
-            if (!jwtUtil.validateToken(token)) {
-                log.warn("WebSocket连接token无效");
-                return null;
+            if (token != null && jwtUtil.validateToken(token)) {
+                Long userId = jwtUtil.getUserIdFromToken(token);
+                String username = jwtUtil.getUsernameFromToken(token);
+                StompPrincipal principal = new StompPrincipal(userId, username);
+                accessor.setUser(principal);
+                log.info("WebSocket用户连接(来自STOMP头): userId={}, username={}", userId, username);
+                return MessageBuilder.createMessage(
+                    message.getPayload(), accessor.getMessageHeaders());
             }
 
-            Long userId = jwtUtil.getUserIdFromToken(token);
-            String username = jwtUtil.getUsernameFromToken(token);
-            accessor.setUser(new StompPrincipal(userId, username));
-            log.info("WebSocket用户连接: userId={}, username={}", userId, username);
+            log.warn("WebSocket连接认证失败");
+            return null;
         }
 
+        // 非CONNECT消息，原样返回(保留session级别的user principal)
         return message;
     }
 }
