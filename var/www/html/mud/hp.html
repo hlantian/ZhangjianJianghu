@@ -1,0 +1,81 @@
+<html>
+<head>
+<title>l1</title>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<style type="text/css">
+<!--
+.qx {font-size: 9pt; color : #000000}
+.small {  font-size: 9pt}
+-->
+</style>
+<script>
+var picscale=160;
+function changeall(qx,mqx,jl,mjl,nl,mnl,sw,ys,jy,qn) {
+	if(mqx==0) {qx=0;mqx=1}
+	document.qx_pic.width=qx*picscale/mqx;
+	if(mjl==0) {jl=0;mjl=1}
+	document.jl_pic.width=jl*picscale/mjl;
+	if(mnl==0) {nl=0;mnl=1}
+	document.nl_pic.width=nl*picscale/mnl;
+	
+	qx=fmt(qx);
+	mqx=fmt(mqx);
+	jl=fmt(jl);
+	mjl=fmt(mjl);
+	nl=fmt(nl);
+	mnl=fmt(mnl);
+	sw=fmt(sw);
+	ys=fmt(ys);
+	jy=fmt(jy);
+	qn=fmt(qn);
+	
+	document.all.qx.innerHTML=qx+"/"+mqx;
+	document.all.jl.innerHTML=jl+"/"+mjl;
+	document.all.nl.innerHTML=nl+"/"+mnl;
+	document.all.sw.innerHTML=sw;
+	document.all.ys.innerHTML=ys;
+	document.all.jy.innerHTML=jy;
+	document.all.qn.innerHTML=qn;
+}
+function fmt(n) {
+	if(n>1000000) r=Math.round(n/100000)/10+"M";
+	else if(n>1000) r=Math.round(n/100)/10+"k";
+	else r=n;
+	return r;
+}
+</script>
+</head>
+
+<body bgcolor="#E0E0E0" leftmargin="0" topmargin="0" onload="top.send_msg('hp_b')">
+<table width="320" border="1" cellspacing="0" cellpadding="0" bgcolor="#989898" height="75">
+             <table width="100%" border="0" cellspacing="1" cellpadding="0" align="center" class="qx">
+			  	<tr>
+					<td width="80%">
+	                    <font color="#000000">&nbsp;气血：</font>
+	                    <img src="images/qx1.gif" height="12">
+						<img src="images/qx.gif" name=qx_pic width="160" height="8"><br>
+	                    <font color="#000000">&nbsp;精力：</font>
+	                    <img src="images/jl1.gif" height="12">
+	                    <img src="images/jl.gif" name=jl_pic width="160" height="8"><br>
+	                    <font color="#000000">&nbsp;内力：</font>
+	                    <img src="images/nl1.gif" height="12">
+	                    <img src="images/nl.gif" name=nl_pic width="160" height="8">
+					</td>
+					<td width="20%">
+				  	<div align="right"><font id=qx color="#000000">0/0</font></div>
+                    <div align="right"><font id=jl color="#000000">60/1000</font></div>
+                    <div align="right"><font id=nl color="#000000">100/1000</font>
+					</td>
+				</tr>
+			  </table>
+              <table width="100%" border="0" cellspacing="2" cellpadding="2" class="qx" align="center">
+                <tr> 
+                  <td width="25%" height="14"><font color="#000000">食物：<font id=sw>0</font></font></td>
+                  <td width="25%" height="14"><font color="#000000">饮水：<font id=ys>0</font></font></td>
+                  <td width="25%" height="14"><font color="#000000">经验：<font id=jy>0</font></font></td>
+                  <td width="25%" height="14"><font color="#000000">潜能：<font id=qn>0</font></font></td>
+                </tr>
+              </table>
+</table>
+</body>
+</html>

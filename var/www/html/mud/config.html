@@ -1,0 +1,69 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+
+<html>
+<head>
+<style type="text/css">
+<!--
+.small {  font-size: 9pt}
+</style>
+<script language=javascript>
+function loadButtons() {
+	for(i=0;i<top.cd.length;i++) {
+		eval("document.frm.sltButtons.options[i].text=top.document.all.cb"+i+".innerHTML");
+		document.frm.sltButtons.options[i].value=i;
+	}
+	loadButton(document.frm.sltButtons.selectedIndex);
+}
+function loadButton(No) {
+	document.frm.txtScript.value=top.cs[No].join("\n");
+	document.frm.txtTimes.value=top.ctimes[No];
+	eval("document.frm.txtName.value=top.document.all.cb"+No+".innerHTML");
+}
+function saveButton(No) {
+	top.cs[No]=document.frm.txtScript.value.split("\n");
+	top.ctimes[No]=parseInt(document.frm.txtTimes.value);
+	eval("top.document.all.cb"+No+".innerHTML=document.frm.txtName.value");
+	loadButtons();
+}
+</script>
+</head>
+
+<body class=small onLoad="loadButtons();">
+<form name=frm action="">
+<p>  ◆选择快捷按钮： 
+    <select name="sltButtons" onChange="loadButton(document.frm.sltButtons.selectedIndex);">
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+      <option value="1">1</option>
+    </select>
+  </p>
+  ◆按钮标题：<input type="text" name="txtName" size="6" maxlength="10"><br>
+  ◆输入指令脚本(每行一条指令)：<br>
+    <textarea name="txtScript" cols="33" rows="11"></textarea><br>
+  ◆执行次数: 
+    <input type="text" name="txtTimes" value="1" size="2" maxlength="2">
+    次。<br><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="button" name="Button" width="50" value="确定" onClick="saveButton(document.frm.sltButtons.selectedIndex);">
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="button" name="Submit2" value="放弃">
+</form>
+</body>
+</html>

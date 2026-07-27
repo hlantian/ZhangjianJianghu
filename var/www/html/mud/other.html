@@ -1,0 +1,40 @@
+<html>
+<head>
+<style type="text/css">
+<!--
+.small {font-size: 9pt; color: #000000;}
+#a{color:#336699;cursor:hand;text-decoration:underline}
+-->
+</style>
+<script language=javascript>
+function showinfo(description) {
+	document.all.info.innerHTML=description;
+}
+function sa(str) 
+{
+	document.write("<font id=a onMouseUp=\'actor(\""+str+"\")\'>"+str+"</font>");
+} 
+
+//function actor(str) {showmenu()} 
+function actor(str) {addname(str)} 
+function thing(str){addname(str)} 
+function room(str){sendmsg("goto "+str)} 
+
+function addname(str) 
+{
+	top.main.document.frmCommand.tmpcmd.value += str;
+} 
+ 
+function sendmsg(msg)
+{
+	top.main.send_msg(msg);
+}
+</script>
+</head>
+
+<body bgcolor="#E0E0E0" leftmargin="0" topmargin="0">
+
+<font class=small id=info>&nbsp;&nbsp;Loading......</font>
+
+</body>
+</html>

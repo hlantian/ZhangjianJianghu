@@ -1,0 +1,108 @@
+<html>
+<head>
+<title>help</title>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<style type="text/css">
+<!--
+.small {  font-size: 9pt; line-height: 15pt}
+.big {  font-size: 10.5pt}
+-->
+</style>
+</head>
+
+<body bgcolor="#000000" topmargin="0">
+<table width="680" border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#371C00">
+  <tr valign="top"> 
+    <td height="581"> 
+      <table width="680" border="0" cellspacing="0" cellpadding="0" align="center">
+        <tr> 
+          <td width="30" height="9"> 
+            <div align="center"><img src="images/h8.gif" width="12" height="15"></div>
+          </td>
+          <td height="9">&nbsp;</td>
+          <td width="30" height="9"> 
+            <div align="center"><img src="images/h8.gif" width="12" height="15"></div>
+          </td>
+        </tr>
+      </table>
+      <table width="620" border="0" cellspacing="0" cellpadding="0" align="center">
+        <tr> 
+          <td width="21"><img src="images/h6.gif" width="21" height="20"></td>
+          <td width="576" background="images/h7.gif" class="big"> 
+            <div align="center"><font color="#FFFFFF">------- <font color="#CCFF66">新手上路 
+              </font>-------</font></div>
+          </td>
+          <td width="21"><img src="images/h5.gif" width="21" height="20"></td>
+        </tr>
+      </table>
+      <table width="620" border="0" cellspacing="0" cellpadding="0" align="center" class="small" bgcolor="#706F6F">
+        <tr> 
+          <td height="586" width="10">&nbsp;</td>
+          <td height="586" width="600" class="big" valign="top"><font color="#FFFFFF" class="small"> 
+            <font color="#CCFF66"><span class="big">4）</span></font><span class="big">生存：</span><br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">list</font>：当你进入店铺时，可是试着使用list指令，察看这里可以买什么东西，比如鸡腿，酒袋等。(当然你要有钱，这里的钱分为三种：金子，银子，铜钱。)<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">buy</font> &lt;物品名&gt;：购买物品<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;只要你身上有足够的钱，系统会自动扣除相应的价钱，如果你的钱不够，会告诉你买不起的信息。只要成功买到后，你再使用i指令，就可以看到身上多了买到的东西。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;那么，钱怎么来呢？如果你武功好，就可以四处寻找一些身上有钱或者有东西的NPC杀死后搜出来，而新手们只好四处看看捡些东东到当铺去卖。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">sell</font> &lt;物品名&gt;：卖出东西<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;只有当铺才可以使用，你可以先用list &lt;物品名&gt;察看该物品的价格，注意，卖出的东西只能得到该物品一半的价钱，因为这里是当铺呀，呵呵<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">eat</font> &lt;食物名&gt;：吃东西<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">drink</font> &lt;饮料名&gt;：喝东西；至于那些东西能吃喝，你一看就明白了，实在不行，试一下就ok了。<br>
+            <span class="big"><font color="#CCFF66">5）</font>金钱：</span><br>
+            &nbsp;&nbsp; &nbsp;&nbsp;只用在钱庄可以存取金钱，这样即便你不小心死了后，还可来此取出钱。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;cun &lt;数量&gt; &lt;货币单位&gt;: 存钱，如cun 50 silver,就是指存了50两银子。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;qu &lt;数量&gt; &lt;货币单位&gt;: 取钱，如qu 50 silver,就是指取出了50两银子。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;convert &lt;数量&gt; &lt;源货币单位&gt; to &lt;目标货币单位&gt;: 
+            兑换，如convert 1 silver to coin,就是指把一两银子换成了铜钱，你会得到100文铜钱。<br>
+            <span class="big"><font color="#CCFF66">6）</font>捡东西：</span><br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">get</font> &lt;物品名&gt;：前提是地上有东西可以捡，并且你的负重允许。如：get 
+            鸡腿，你从地上捡起一只鸡腿。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">get</font> &lt;物品名&gt; 
+            &lt;数量&gt;：一次捡起多个东西，如：get 长剑 2，你从地上捡起2把长剑。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">get all</font>：把地上所有的能捡起的东西都捡起来，然后再看看，将没用的扔掉drop(用法同get)。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">get 长剑 from 岳不群</font>：你从岳不群身上取得长剑。前提是他处于晕倒状态，或者从他的尸体上搜出来。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">get all from 岳不群</font>：类似。<br>
+            <span class="big"><font color="#CCFF66">7）</font>拜师学艺：</span><br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">bai</font> &lt;人名&gt;：只能拜NPC为师傅，如果他可以收徒弟，并且你满足他收徒弟的条件的话，他就会成为你的师傅，同时你成为该门派的弟子，随着你武功，经验的不断增加，你可以拜更高一级的师傅，学习更高的武功。目前不允许背叛师门，所以请慎重选择。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">xue</font> &lt;人名&gt; 
+            &lt;技能名&gt;: 你可以先用skills &lt;师傅名&gt;来查看你师傅的武功，然后学习你要学的武功，学习会耗费潜能，并且技能增长的速度和你的悟性有关。 
+            <br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">lian</font> &lt;基本武功&gt;: 
+            你可以用该指令练习自己的基本武功。<br>
+            <span class="big"><font color="#CCFF66">8）</font>战斗：</span><br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">fight</font> &lt;人名&gt;：和别人切磋武功，当你的气血低于一半的值时，会自动退出战斗。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">hit</font> &lt;人名&gt;：遇上一些不愿动手的NPC，可以强行开战。<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">kill</font> &lt;人名&gt;：杀死对方，双方自动进入对杀状态，直到一方死亡为止。<br>
+            <span class="big"><font color="#CCFF66">9）</font>物品递交：</span><br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">give &lt;物品&gt; to 
+            &lt;人名&gt;</font>: 把某物品给某人<br>
+            &nbsp;&nbsp; &nbsp;&nbsp;<font color="#CCFF66">give &lt;数量&gt; &lt;物品&gt; 
+            to &lt;人名&gt;</font>: 把一定数量的物品给某人</font> </td>
+          <td height="586" width="10">&nbsp;</td>
+        </tr>
+      </table>
+      <table width="620" border="0" cellspacing="0" cellpadding="0" align="center">
+        <tr> 
+          <td height="17" width="21"><img src="images/h1.gif" height="20"></td>
+          <td height="17" width="521" background="images/h3.gif">&nbsp;</td>
+          <td height="17" width="57" background="images/h3.gif"><a href="help3.htm"><img src="images/h4.gif" width="50" height="14" border="0"></a></td>
+          <td height="17" width="21"><img src="images/h2.gif" width="21" height="20"></td>
+        </tr>
+      </table>
+      <table width="680" border="0" cellspacing="0" cellpadding="0" align="center">
+        <tr> 
+          <td width="30">
+            <div align="center"><img src="images/h8.gif" width="12" height="15"></div>
+          </td>
+          <td>&nbsp;</td>
+          <td width="30">
+            <div align="center"><img src="images/h8.gif" width="12" height="15"></div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<br>
+</body>
+</html>

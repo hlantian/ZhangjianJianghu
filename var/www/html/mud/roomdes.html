@@ -1,0 +1,25 @@
+<html>
+<head>
+<style type="text/css">
+<!--
+.roomdes {font-size: 9pt; color: #000000;}
+-->
+</style>
+<script language=javascript>
+function showroom(description) {
+	document.all.roomdescription.innerHTML=description;
+}
+function sendmsg(cmd) {top.send_msg(cmd)}
+function init() {
+	top.roomfrmloaded=true;
+	top.showroom(top.roomfrmtitle,top.roomfrmtext);
+}
+</script>
+</head>
+
+<body topmargin=3 leftmargin=3  background="images/bg1.gif" onload="init()">
+
+&nbsp;&nbsp;&nbsp;<font class=roomdes id=roomdescription>Loading......</font>
+
+</body>
+</html>

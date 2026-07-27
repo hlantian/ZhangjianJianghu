@@ -1,0 +1,12 @@
+#class=YQuest
+begin of YPropertyGroup
+string values:
+long values:
+end of YPropertyGroup
+begin of YObjectGroup
+object=/common/quest/ÔÀ²»Èº
+object=/common/quest/²Ì½øÖÒ
+object=/common/quest/¶À¹ÂÇó°Ü
+object=/common/quest/Î¤Ð¡±¦
+object=/common/quest/Í¯ÀÇ
+end of YObjectGroup

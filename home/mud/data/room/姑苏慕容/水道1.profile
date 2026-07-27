@@ -1,0 +1,18 @@
+#class=YRoom
+begin of YPropertyGroup
+string values:
+名字=水道
+描述=@LONG
+    这里是一个很大的湖，满湖的是荷叶，景色让人心旷神怡。<br>
+    这里明显的出口是<a href='javascript:sendmsg("e")'>东</a>、<a href='javascript:sendmsg("w")'>西</a>、<a href='javascript:sendmsg("s")'>南</a>、<a href='javascript:sendmsg("sw")'>西南</a>、<a href='javascript:sendmsg("ne")'>东北</a>。
+LONG
+东=燕子坞
+东北=水道
+西南=听香水榭
+南=玄霜庄
+西=水道2
+long values:
+float values:
+end of YPropertyGroup
+begin of YObjectGroup
+end of YObjectGroup

@@ -1,0 +1,643 @@
+<html>
+<head>
+<title>MUD</title>
+<meta http-equiv="Content-Type" content="text/html; charset=gb2312">
+<style type="text/css">
+<!--
+.small {  font-size: 9pt}
+a:link {  font-size: 9pt; color: #FFFFFF; text-decoration: none}
+a:hover {  font-size: 9pt; text-decoration: none}
+a:active {  font-size: 9pt; text-decoration: none}
+a:visited {  text-decoration: none; color: #FFFFFF}
+.middle {  font-size: 10.5pt}
+.large {  font-size: 12pt}
+input {  font-size: 12px; border-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-top-width: 1px; border-left-width: 1px}
+.box {position: absolute; color : Black; font-size : 9pt; background-color : Silver; border-style : solid; border-width : thin;}
+.qx {font-size: 9pt; color : #000000}
+.cc { font: 9pt "宋体"; cursor: hand; color: #000000}
+.cc:hover   { font: 9pt "宋体"; cursor: hand; color: #FF0033; background-color : #0000FF;}
+.roomdes {font-size: 9pt; color: #000000;}
+-->
+</style>
+<script language=javascript src="menu.js"></script>
+<script language=javascript>
+<!--
+var length=50;
+var actor;
+var wa;
+var wb;
+var wc;
+var actimg;
+var actname;
+var actNo;
+var selfname;
+
+var X=new Array(length);
+var Y=new Array(length);
+for(i=0; i<length; i++) {X[i]=-1;Y[i]=-1;}
+
+var selname="";
+
+var DoDimWord=false;
+
+var infoFrameLoaded=false;
+var infoFrameInited=false;
+
+var showfunc;
+
+var dic=new Array(length);
+var anix=new Array(length);
+var aniy=new Array(length);
+var imgno=new Array(length);
+var s_move=new Array(length)
+for(i=0; i<length; i++){imgno[i]=1;s_move[i]=0;}
+
+var cs=new Array(10);
+var cd=new Array("我闪","任务","放弃","补血","精力","★★","★★","★★","★★","★★");
+var ctimes=new Array(1,1,1,1,1,1,1,1,1,1);
+var ctimesnow=new Array(1,1,1,1,1,1,1,1,1,1);
+for(i=0;i<cs.length;i++) {
+	cs[i]=new Array();
+}
+cs[0][0]="我闪！";
+cs[1][0]="quest";
+cs[2][0]="giveup";
+cs[3][0]="yun qi";
+cs[4][0]="yun jing";
+
+var pic=new Array(10);
+for(i=0; i<pic.length; i++) pic[i]=new Image(38,39);
+pic[0].src="images/p1.gif";
+pic[1].src="images/p2.gif";
+pic[2].src="images/p3.gif";
+pic[3].src="images/p4.gif";
+pic[4].src="images/m1.gif";
+pic[5].src="images/m2.gif";
+pic[6].src="images/m3.gif";
+pic[7].src="images/m4.gif";
+pic[8].src="images/p6.gif";
+pic[9].src="images/m6.gif";
+
+function init() {
+	if(!top.infofrminited) {
+		document.frames["ifrmmsg"].document.write("<script src=\"http://210.77.145.225/mud/info.js\"></script>\n<style type=\"text/css\">\n<!--body{font-size: 9pt}-->\n</style>");
+		top.infofrminited=true;
+		showinfo("");
+	}
+	//send_msg("look_b");
+}
+function documentclick() {
+	if (event.button==2) {
+		s=prompt("请输入命令:","在此键入命令");
+		if((s!="") && (s!="在此键入命令") && (s!=null)) send_msg(s);
+	}
+}
+document.onmousedown=documentclick;
+function clearsay() {
+	showinfo("<font color=ff7777>"+document.frmCommand.tmpcmd.value+"</font><br>");
+	document.frmCommand.command.value = document.frmCommand.tmpcmd.value;
+	if (document.frmCommand.command.value=="") {
+  		alert('你总得说点什么吧？');
+  		return false;
+	}
+	//document.frmCommand.tmpcmd.value = "";
+	document.frmCommand.tmpcmd.select();
+	document.frmCommand.tmpcmd.focus();
+	
+  return true;
+}
+function sendmsg(cmd) {send_msg(cmd);return false;}
+function send_msg(cmd){
+	hidemenu();
+	cmd="/"+cmd;
+	document.frmCommand.command.value = cmd;
+	document.frmCommand.submit();
+	document.frmCommand.tmpcmd.focus();
+}
+function movehere() {
+	hidemenu();
+	x=event.clientX + document.body.scrollLeft-document.all.main.style.pixelLeft-10;
+	y=event.clientY + document.body.scrollTop-document.all.main.style.pixelTop-50;
+	move(selfname,x,y);
+	send_msg("move "+x+" "+y);
+}
+var actorReady=false;
+var largestActorNo=0;
+function printActor(No,name) {
+	document.write("<div id=actor"+No+" style=\'position:absolute; font-size=7pt; display:none; Left:50; Top:50\'>");
+	document.write("<table  cellspacing=\"2\" cellpadding=\"2\" border=\"0\">");
+	document.write("<tr>");
+	document.write("    <td>");
+	document.write("<font class=\"small\" id=word"+No+"c size=\"-1\" color=\"00cc00\"></font><br>");
+	document.write("<font class=\"small\" id=word"+No+"b size=\"2\" color=\"009900\"></font><br>");
+	document.write("<font class=\"small\" id=word"+No+"a color=\"003300\"></font>");
+	document.write("</td>");
+	document.write("</tr>");
+	document.write("<tr>");
+	document.write("    <td><img onMouseOver=\"this.style.cursor=\'hand\';\" width=38 height=39");
+	document.write(" onMouseDown=\"selname=document.all.name"+No+".innerHTML;showmenu(1);\" id=pic"+No+" src=\"images/p1.gif\"></td>");
+	document.write("</tr>");
+	document.write("<tr>");
+	document.write("    <td><font class=\"small\" color=black id=name"+No+">"+name+"</font></td>");
+	document.write("</tr>");
+	document.write("</table>");
+	document.write("</div>");
+	largestActorNo=largestActorNo>No?largestActorNo:No;
+	dic[No]=name;
+}
+function selActor(name) {
+	if(!actorReady){
+		printActor(largestActorNo+1,name);
+		largestActorNo++;
+	}
+	for(i=0; i<dic.length; i++) {
+		if((dic[i]==name)||(i==dic.length-1)) {
+			eval("actor=document.all.actor"+i+".style");
+			eval("wa=document.all.word"+i+"a");
+			eval("wb=document.all.word"+i+"b");
+			eval("wc=document.all.word"+i+"c");
+			eval("actimg=document.all.pic"+i);
+			eval("actname=document.all.name"+i);
+			actNo=i;
+			break;
+		}
+	}
+}
+function addActor(name,x,y,pn) {
+	for(i=0; i<dic.length-1; i++) {
+		if(dic[i]=="") {
+			dic[i]=name;
+			selActor(name);
+			actname.innerHTML=name;
+			actor.pixelLeft=x;
+			actor.pixelTop=y;
+			wa.innerHTML=""
+			wb.innerHTML=""
+			wc.innerHTML=""
+			if(pn!=null) {actimg.src=pic[pn].src; imgno[i]=pn;}
+			actor.display="";
+			break;
+		}
+	}
+}
+function setself(name) {
+	selfname=name;
+}
+var deadname;
+function setdead(name) {
+	deadname=name;
+}
+function delActor(name) {
+	if(name==deadname) {deadani(name,0); return;};
+	selActor(name);
+	actor.display="none";
+	dic[actNo]="";
+}
+var cleared;
+function deadani(name,times) {
+	if(times==0) cleared=false;
+	if(cleared) delActor(name);
+	selActor(name);
+	if((times%2)==0) actor.display="none";
+	else actor.display="";
+	if(times>=4) dic[actNo]="";
+	else setTimeout("deadani(\""+name+"\","+(times+1)+")",300);
+}
+function clearActor() {
+	deadname="";
+	cleared=true;
+	for(i=0; i<length-1; i++) {
+		if(dic[i]!="") delActor(dic[i]);
+		s_move[i]=0;
+	}
+}
+function move(name,x,y,t) {
+	selActor(name);
+	if(t==1) {
+		actor.pixelLeft=x;
+		actor.pixelTop=y;
+		return;
+	}
+	X[actNo]=x;
+	Y[actNo]=y;
+	s_move[actNo]=1;
+	moveOne(actNo);
+}
+function moveOne(No) {
+	if((X[No]==-1)||(Y[No]==-1)||(!(s_move[i]))) {s_move[i]=0;return;}
+	eval("act=document.all.actor"+No+".style");
+	var dx=X[No]-act.pixelLeft;
+	var dy=Y[No]-act.pixelTop;
+	if((dx==0)&&(dy==0)) {
+		dx=-1; dy=-1;
+		return;
+	}
+	var dxy=Math.abs(dx)-Math.abs(dy);
+	var mx,my;
+	if(dxy>0) {mx=(dx>0)?10:-10;my=dy/(Math.abs(dx)/10);}
+	else {my=(dy>0)?10:-10;mx=dx*10/Math.abs(dy);}
+	if(((mx==0)&&(dx!=0))||(Math.abs(mx)>Math.abs(dx))) mx=dx;
+	if(((my==0)&&(dy!=0))||(Math.abs(my)>Math.abs(dy))) my=dy;
+	act.pixelLeft+=mx;
+	act.pixelTop+=my;
+	setTimeout("moveOne("+No+")",2);
+}
+function say(name,word) {
+	selActor(name);
+	if(name!="") {
+		if(wa!="") {
+			if(wb!="") {
+				wc.innerHTML=wb.innerHTML;
+				wc.style.color=wb.style.color;
+			}
+			wb.innerHTML=wa.innerHTML;
+			wb.style.color=wa.style.color;
+		} 
+		wa.innerHTML=word;
+		wa.style.color="#000000";
+		showinfo("【<a href=n OnMouseDown=\'return actor(\""+name+"\")\' target=result>"+name+"</a>】"+word+"<br>");
+		DoDimWord=true;
+	}
+	else {
+		showinfo(word+"<br>");
+	}
+}
+function dimword() {
+	if(DoDimWord) {
+		for(var i=0; i<dic.length-1; i++) {
+			if(dic[i]=="") continue;
+			dimm(eval("document.all.word"+i+"c"));
+			dimm(eval("document.all.word"+i+"b"));
+			dimm(eval("document.all.word"+i+"a"));
+		}
+	}
+	setTimeout("dimword()",5000);
+}
+function dimm(word) {
+	if(word.innerHTML=="") return;
+	s=word.style.color;
+	s1="#";
+	for(var i=1; i<=6; i++){
+		switch(s.charAt(i)) {
+			case "0": 
+				s1+="1";
+				break;
+			case "1":
+				s1+="2";
+				break;
+			case "2":
+				s1+="4";
+				break;
+			case "4":
+				s1+="8"
+				break;
+			default:
+				s1+="F";
+		}
+	}
+	if(s1=="#FFFFFF") word.innerHTML="";
+	else word.style.color=s1;
+}
+var chedpic=true;
+function chpic(name,No) {
+	if(No>=pic.length) return;
+	selActor(name);
+	actimg.src=pic[No].src;
+	imgno[actNo]=No;
+	chedpic=true;
+}
+function near(n1,n2) {
+	selActor(n2);
+	if(actNo>=length) return;
+	var x=actor.pixelLeft;
+	var y=actor.pixelTop;
+	selActor(n1);
+	if(actor.pixelLeft<x) {x-=35; retVal=1;}
+	else {x+=35;retVal=2;}
+	move(n1,x,y,1);
+	return retVal;
+}
+function hit(n1,n2) {
+	selActor(n1);
+	if(actNo>=length) return;
+	var x=actor.pixelLeft;
+	var y=actor.pixelTop;
+	var dir=near(n1,n2);
+	var pic_no=imgno[actNo];
+	if(imgno[actNo]<4) {
+		if(dir==1) chpic(n1,3);
+		else chpic(n1,8)
+	}
+	else if((imgno[actNo]>=4)&&(imgno[actNo]<=7)) {
+		if(dir==1) chpic(n1,7);
+		else chpic(n1,9)
+	}
+	chedpic=false;
+	setTimeout("move_chpic(\""+n1+"\","+x+","+y+","+pic_no+")",400);
+}
+function move_chpic(name,x,y,pic_no) {
+	move(name,x,y,1);
+	if(!chedpic) chpic(name,pic_no);
+}
+var infofrmtext="";
+function showinfo(info) {
+	if(top.infofrminited) {
+		document.frames["ifrmmsg"].document.write(infofrmtext+info);
+		infofrmtext="";
+	}
+	else {
+		infofrmtext+=info;
+	}
+}
+function switchscroll() {
+	if(!top.infofrminited) return;
+	if(document.all.scrlbtn.innerHTML=="8") {
+		document.frames["ifrmmsg"].scrollOn();
+		document.all.scrlbtn.innerHTML="x";
+	}
+	else {
+		document.frames["ifrmmsg"].scrollOff();
+		document.all.scrlbtn.innerHTML="8";
+	}
+}
+function showinfo2(info) {
+	document.frames["frmoth"].showinfo(info);
+}
+var roomfrmloaded=false;
+var roomfrmtitle="";
+var roomfrmtext="Loading......";
+function showroom(title,description) {
+	if(roomfrmloaded) {
+		document.all.roomtitle.innerHTML=title;
+		showinfo("你来到了<font color=00ffff>"+title+"</font><br>");
+		document.frames["ifrmroom"].showroom(description);
+		//document.all.roomdescription.innerHTML=description;
+	}
+	else {
+		roomfrmtitle=title;
+		roomfrmtext=description;
+	}
+}
+function changeall(qx,mqx,jl,mjl,nl,mnl,sw,ys,jy,qn) {
+	document.frames["frmhp"].changeall(qx,mqx,jl,mjl,nl,mnl,sw,ys,jy,qn);
+}
+function cbClick(No) {
+	ctimesnow[No]=1;
+	doScript(No,0);
+}
+function doScript(No,line) {
+	if((cs[No][line]=="#end")||(cs[No][line]=="")||(cs[No][line]==null)) {
+		if(ctimesnow[No]>=ctimes[No]) return;
+		else {
+			ctimesnow[No]++;
+			doScript(No,0);
+			return;
+		}
+	}
+	send_msg(cs[No][line]);
+	setTimeout("doScript("+No+","+(line+1)+")",500);
+}
+function show_map(layerid){
+	if(layerid!="mudmap") hidden_map("mudmap");
+	if(layerid!="config") hidden_map("config");
+	if(layerid!="message") hidden_map("message");
+	eval(layerid+".style.visibility='';");
+}
+function showhp() {
+	document.all.oth.style.display="none";
+	document.all.hp.style.display="";
+}
+function showoth(cmd) {
+	document.all.hp.style.display="none";
+	document.frames["frmoth"].showinfo("&nbsp;&nbsp;Loading....");
+	document.all.oth.style.display="";
+	send_msg(cmd);
+}
+function hidden_map(layerid){
+	eval(layerid+".style.visibility='hidden';");
+}
+
+function MM_findObj(n, d) { //v3.0
+  var p,i,x;  if(!d) d=document; if((p=n.indexOf("?"))>0&&parent.frames.length) {
+    d=parent.frames[n.substring(p+1)].document; n=n.substring(0,p);}
+  if(!(x=d[n])&&d.all) x=d.all[n]; for (i=0;!x&&i<d.forms.length;i++) x=d.forms[i][n];
+  for(i=0;!x&&d.layers&&i<d.layers.length;i++) x=MM_findObj(n,d.layers[i].document); return x;
+}
+//-->
+</script>
+</head>
+
+<body leftmargin="0" topmargin="0" bgcolor="#2F5F90" text="#FFFFFF" onload="init();">
+<script>genmenu();</script>
+<div id="man" style="position:absolute; left:451px; top:443px; width:312px; height:96px; z-index:4"> 
+  <table width="315" border="1" cellspacing="0" cellpadding="0" class="middle" bordercolorlight="#FFFFFF" bordercolordark="#306090" background="images/1.gif">
+    <tr> 
+      <td width="294" height="18">&nbsp;<span class="small">&nbsp;
+	  	<a href="javascript:showhp()"><font color="#FFFFFF">体力</font></a> |  
+        <a href="javascript:showoth('skills_b')"><font color="#FFFFFF">技能</font></a> | 
+        <a href="javascript:showoth('score_b')"><font color="#FFFFFF">状态</font></a> | 
+		<a href="javascript:showoth('i_b')"><font color="#FFFFFF">物品</font></a> 
+        |</span></td>
+    </tr>
+  </table>
+  <table width="315" border="1" cellspacing="0" cellpadding="0" bgcolor="#989898" height="85">
+    <tr> 
+      <td height="80"> 
+        <table width="97%" border="1" cellspacing="0" cellpadding="0" align="center" bgcolor="#E0E0E0" bordercolorlight="#E8E8E8" bordercolordark="#000000">
+          <tr> 
+            <td height="71" width="100%">
+				<div id="oth" style="position:absolute; display:none width:299px; height:68px; z-index:7; left: 9px; top: 30px">
+					<iframe name=frmoth frameborder=0 width=100% height=100%" src="other.html"></iframe>
+				</div>
+				<div id="hp" style="position:absolute; display:on; width:299px; height:68px; z-index:7; left: 9px; top: 30px">
+					<iframe name=frmhp frameborder=0 width=98% height=100% scrolling="no" src="hp.html"></iframe>
+				</div>
+			</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  </div>
+<div id="main" style="position:absolute; left:16px; top:45px; width:432px; height:492px; z-index:5"> 
+  <table width="425" border="1" cellspacing="0" cellpadding="0" bgcolor="#FFFFFF"  bordercolorlight="#FFFFFF" bordercolordark="#336699">
+    <tr> 
+      <td width="417" class="middle" background="images/1.gif" height="17"><span class="middle">&nbsp;</span> 
+        <span id=roomtitle class="small">主窗口</span></td>
+    </tr>
+  </table>
+
+  <table width="425" border="1" cellspacing="0" cellpadding="0" bgcolor="#989898">
+    <tr>
+      <td height="482" width="678"> 
+        <table width="97%" border="1" cellspacing="0" cellpadding="0" align="center" bgcolor="#E3E3E3" bordercolorlight="#E0E0E0" bordercolordark="#000000">
+          <tr>
+            <td height="100" background="images/bg1.gif">
+			<iframe frameborder=0 name=ifrmroom height=100 width=100% src=roomdes.html></iframe>
+			</td>
+          </tr>
+        </table>
+        <table width="97%" border="1" cellspacing="0" cellpadding="0" align="center" bordercolorlight="#E0E0E0" bordercolordark="#000000">
+          <tr valign="top"> 
+            <td height="318" background="images/bg1.gif" onClick="showmenu(2);"> <br>
+				<script>for(i=0;i<dic.length;i++) {printActor(i,"");};actorReady=true;</script>
+			</td>
+          </tr>
+          <tr bgcolor="#666666"> 
+            <td height="32" width="100%"> 
+              <table width="98%" border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#666666">
+				<form action="/cgi-bin/mud/command" method="post" target="result" name="frmCommand" onSubmit="return clearsay();">
+                  <tr valign="middle">
+                    <td height="28" width="20%" valign="middle" align="center"> 
+                      <select name="channel">
+                        <option selected>命令</option>
+                        <option>说话</option>
+                        <option>公用频道</option>
+                        <option>谣言频道</option>
+                        <option>新手频道</option>
+                      </select>
+                    </td>
+                    <td height="28" width="69%" valign="middle" align="center"> 
+						<input type="hidden" name="sessionid" value="0000000">
+						<input type="hidden" name="command" value="">
+                      	<input type="text" name="tmpcmd" size="40">
+                    </td>
+                    <td colspan="4" height="28" width="11%" align="left" valign="bottom"> 
+                      <input type="image" style="border-width: 0px" name="image" src="images/2.gif">
+                    </td>
+                  </tr>
+                </form>
+				<script language="JavaScript">
+					document.frmCommand.sessionid.value=parent.sessionid 
+				</script> 
+              </table>
+            </td>
+          </tr>
+        </table>
+		<script>dimword();</script>
+        <table width="97%" border="1" cellspacing="0" cellpadding="0" height="25" class="small" align="center" bordercolorlight="#E0E0E0" bordercolordark="#000000" background="images/bg2.gif">
+          <tr>
+            <td width="10%"><a align="center" id=cb0 href=# onMouseDown="cbClick(0);">[我闪]</a></td>
+            <td width="10%"><a align="center" id=cb1 href=# onMouseDown="cbClick(1);">[任务]</a></td>
+            <td width="10%"><a align="center" id=cb2 href=# onMouseDown="cbClick(2);">[放弃]</a></td>
+            <td width="10%"><a align="center" id=cb3 href=# onMouseDown="cbClick(3);">[补血]</a></td>
+            <td width="10%"><a align="center" id=cb4 href=# onMouseDown="cbClick(4);">[精力]</a></td>
+            <td width="10%"><a align="center" id=cb5 href=# onMouseDown="cbClick(5);">[★★]</a></td>
+            <td width="10%"><a align="center" id=cb6 href=# onMouseDown="cbClick(6);">[★★]</a></td>
+            <td width="10%"><a align="center" id=cb7 href=# onMouseDown="cbClick(7);">[★★]</a></td>
+            <td width="10%"><a align="center" id=cb8 href=# onMouseDown="cbClick(8);">[★★]</a></td>
+            <td width="10%"><a align="center" id=cb9 href=# onMouseDown="cbClick(9);">[★★]</a></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  </div>
+<div id="mudmap" style="position:absolute; left:451px; top:47px; width:320px; height:367px; z-index:3; visibility:hidden"> 
+  <table width="315" border="1" cellspacing="0" cellpadding="0" bordercolorlight="#FFFFFF" bordercolordark="#306090" class="small" background="images/1.gif">
+    <tr> 
+      <td height="18" width="300">&nbsp;<span class="small">&nbsp;地图 | <a href="map/map.htm" target="zmap"><font color="#FFFFFF">总图</font></a></span></td>
+      <td height="18" width="20" align="center" onMouseOver="this.style.cursor='hand';" onClick="hidden_map('mudmap');"><font face="Wingdings" class="middle">x</font><font face="Webdings"></font></td>
+    </tr>
+  </table>
+  <table width="315" border="1" cellspacing="0" cellpadding="0" bgcolor="#999999">
+    <tr> 
+      <td height="365"> 
+        <table width="98%" border="1" cellspacing="0" cellpadding="0" align="center" bgcolor="#E3E3E3" bordercolorlight="#E0E0E0" bordercolordark="#000000">
+          <tr> 
+            <td height="342" width="100%"><iframe name=zmap width=100% height=100% src="map/map.htm" ></iframe></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="config" style="position:absolute; left:450px; top:47px; width:311px; height:384px; z-index:6; visibility: hidden"> 
+  <table width="315" border="1" cellspacing="0" cellpadding="0" bordercolorlight="#FFFFFF" bordercolordark="#306090" class="small" background="images/1.gif">
+    <tr> 
+      <td width="295" height="18">&nbsp;<span class="small">&nbsp;设置快捷按钮</span></td>
+      <td width="19"  onMouseOver="this.style.cursor='hand';" onClick="hidden_map('config');" height="18"> 
+        <div align="center"><font face="Wingdings" class="middle">x</font></div>
+      </td>
+    </tr>
+  </table>
+  <table width="315" border="1" cellspacing="0" cellpadding="0" bgcolor="#999999">
+    <tr> 
+      <td height="363"> 
+        <table width="97%" border="1" cellspacing="0" cellpadding="0" align="center" bgcolor="#E3E3E3" height="300" bordercolorlight="#E0E0E0" bordercolordark="#000000">
+          <tr> 
+            <td height="349" width="100%">
+			<iframe name=messages src="config.html" width=100% height=100%></iframe></td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>
+<div id="message" style="position:absolute; left:450px; top:46px; width:311px; height:370px; z-index:1"> 
+  <table width="315" border="1" cellspacing="0" cellpadding="0" bordercolorlight="#FFFFFF" bordercolordark="#306090" class="small" background="images/1.gif">
+    <tr> 
+      <td width="275" height="18">&nbsp;<span class="small">&nbsp;信息窗口</span></td>
+      <td width="20" onMouseOver="this.style.cursor='hand';" onClick="switchscroll();" height="18"> 
+        <div align="center"><font id=scrlbtn face="Webdings" size=1>x</font></div>
+      </td>
+      <td width="20"  onMouseOver="this.style.cursor='hand';" onClick="hidden_map('message');" height="18"> 
+        <div align="center"><font face="Wingdings" class="middle">x</font></div>
+      </td>
+    </tr>
+  </table>
+  <table width="315" border="1" cellspacing="0" cellpadding="0" bgcolor="#999999">
+    <tr> 
+      <td height="365"> 
+        <table width="97%" border="1" cellspacing="0" cellpadding="0" align="center" bgcolor="#E3E3E3" height="300" bordercolorlight="#E0E0E0" bordercolordark="#000000">
+          <tr> 
+            <td height="352" width="100%">
+				<iframe name=ifrmmsg src="about:blank" width=100% height=100%  style="font-size=9pt" onLoad="infoFrameLoaded=true;"></iframe>
+			</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</div>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" align="center" bgcolor="#0F3F80">
+  <tr> 
+    
+    <td height="40" width="0%">&nbsp;</td>
+    
+    <td height="40" width="27%"> 
+      <div align="center"><img src="images/13.gif" width="192" height="35"></div>
+    </td>
+    
+    <td height="40" width="73%"> 
+      <table width="80%" border="1" cellspacing="0" cellpadding="0" bgcolor="#2F2F2F" class="small" bordercolor="#606060" height="15">
+        <tr> 
+          <td width="20%" height="15"> 
+            <div align="center"><font class="middle" face="Webdings" color="#FF9900">2</font><a href="javascript:show_map('mudmap')">地图窗口</a></div>
+          </td>
+          <td width="20%" height="15"> 
+            <div align="center"><font class="middle" face="Webdings" color="#FF9900">2</font><a href="javascript:show_map('config')">按钮设置</a></div>
+          </td>
+          <td width="20%" height="15"> 
+            <div align="center"><font class="middle" face="Webdings" color="#FF9900">2</font><a href="javascript:show_map('message')">信息窗口</a></div>
+          </td>
+          <td width="20%" height="15"> 
+            <div align="center"><font class="middle" face="Webdings" color="#FF9900">s</font><a href="help.htm" target="_blank">帮助信息</a></div>
+          </td>
+          <td width="20%" height="15"> 
+            <div align="center"><font class="middle" face="Webdings" color="#FF9900">8</font><a href="javascript:send_msg('quit')">退出游戏</a></div>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+<table width="100%" border="0" cellspacing="0" cellpadding="0" height="66%" align="center" bgcolor="#2F5F90">
+  <tr> 
+    <td height="515" width="1%" valign="top">&nbsp; </td>
+    <td height="515" width="98%" valign="top">&nbsp;</td>
+    <td height="515" width="1%" valign="top">&nbsp;</td>
+  </tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd /home/mud/bin
+rm -f /home/mud/data/fifo/*
+rm -f /var/log/webmud/*
+rm -f /var/log/httpd/*
+rm -f /var/spool/mail/*
+

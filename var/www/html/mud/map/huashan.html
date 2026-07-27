@@ -1,0 +1,55 @@
+<html>
+<head>
+<title>华山</title>
+<script type="text/javascript" language="JavaScript">
+	function room(msg) {
+		frmCommand.command.value="goto "+msg;
+		frmCommand.submit();
+		return false;
+	}
+</script>
+</head>
+<body>
+<form action="http://192.168.0.156/cgi-bin/mud/command" method="post" target="result" name="frmCommand" onSubmit="return clearsay();">
+<input type="hidden" name="sessionid" value="eaKPmCBj1q">
+<input type="hidden" name="command" value="">
+</form>
+<script type="text/javascript" language="JavaScript">
+	document.frmCommand.sessionid.value=parent.sessionid 
+</script> 
+<font face="" size="2">
+　　　　　　　　<a href=r onClick='return room("武器房")'>武器房</a>　   <a href=r onClick='return room("男弟子休息室")'>男弟子休息室</a><br>
+　　　　　　　　　│　　　      |<br>
+ 　<a href=r onClick='return room("女弟子休息室")'>女弟子休息室</a>—<a href=r onClick='return room("花园")'>花园</a>─<a href=r onClick='return room("正气堂")'>正气堂</a>─<a href=r onClick='return room("走廊")'>走廊</a>─<a href=r onClick='return room("有所不为轩")'>有所不为轩</a>─<a href=r onClick='return room("内室")'>内室</a><br>
+　　　　　　　　　　　　　│<br>
+　　　　　　　　　　　　<a href=r onClick='return room("青石道")'>青石道</a><br>                       
+　　　　　　　　　　　　　│　　　　　　　　　<a href=r onClick='return room("思过崖")'>思过崖</a>
+- <a href=r onClick='return room("山洞")'>山洞</a> → (<a href=r onClick='return room("秘洞")'>秘洞</a>)<br>
+　　　　　　　　<a href=r onClick='return room("松树林")'>松树林</a>-<a href=r onClick='return room("习武场")'>习武场</a>　　　　　　　　　／<br>
+　　　　　　　　　　　　│　　　　　　　　　<a href=r onClick='return room("陡坡")'>陡坡</a><br>
+　　　　　　　　　　　　│　　　　　　　　　／<br>
+　　　　　    <a href=r onClick='return room("朝阳峰")'>朝阳峰</a>
+　<a href=r onClick='return room("玉女峰")'>玉女峰</a>
+─<a href=r onClick='return room("玉女峰山路")'>玉女峰山路</a>
+—<a href=r onClick='return room("松林")'>松林</a><br>
+　　　　　　　   ＼　　／<br>
+　　　　　　　　 <a href=r onClick='return room("镇岳宫")'>镇岳宫</a><br>
+　　　　　　　　　 |<br>
+　　　　　　　　<a href=r onClick='return room("苍龙岭")'>苍龙岭</a><br>
+　　　　　　　　　 |<br>
+　　　　　　　　<a href=r onClick='return room("猢狲愁")'>猢狲愁</a><br>
+　　　　　　　　　 |<br>
+　　　　　　　　 <a href=r onClick='return room("老君沟")'>老君沟</a><br>
+　　　　　　　 　／<br>
+ 　　　　　　 <a href=r onClick='return room("百尺峡")'>百尺峡</a><br>
+　 　　　　　 　│<br>
+　　 　　　　 <a href=r onClick='return room("千尺幢")'>千尺幢</a><br>
+　　　　　　　 ／<br>
+　　　　　　<a href=r onClick='return room("青柯坪")'>青柯坪</a><br>
+　　　　　　　│<br>
+　　　　　　<a href=r onClick='return room("莎萝坪")'>莎萝坪</a><br>
+　　　　　　／　\<br>
+　　　<a href=r onClick='return room("华山脚下")'>华山脚下</a>　<a href=r onClick='return room("华山瀑布")'>华山瀑布</a> → (大石上)<br>
+</font>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title></title>
+<meta name="GENERATOR" content="Microsoft Visual Studio .NET 7.1">
+<meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5">
+</head>
+<body>
+<SCRIPT language=JavaScript type=""> 
+function CalcIt() 
+{ 
+a=parseInt(document.MYFORM.WuXing.value); 
+b=parseInt(document.MYFORM.JiBie.value); 
+a=(a-10)*2; 
+str=""; 
+for(i=0;i<10;i++) 
+{ 
+c = "" + ((b+i)*(b+i)*10/a + 0.499); 
+str += (b+i) + " : " + parseInt(c); 
+str += "\n"; 
+} 
+document.MYFORM.MSG123.value = str; 
+
+return true; 
+} ; 
+</script>
+<form method="POST" name="MYFORM" ID="Form1">
+<br><br>
+  <p>悟性：<input type="text" name="WuXing" size="20" ID="Text1">&nbsp;&nbsp;&nbsp;             
+<br><br>
+  级别：<input type="text" name="JiBie" size="20" ID="Text2">&nbsp;&nbsp;&nbsp; <input type="button" value="统计" name="B1" onClick="return CalcIt();" ID="Button1"></p>           
+<br><br>
+  <p><textarea rows="11" name="MSG123" cols="69" ID="Textarea1"></textarea></p>           
+<br><br>
+</form> 
+
+</body>
+</html>
