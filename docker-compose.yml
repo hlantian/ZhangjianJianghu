@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: zjjh-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: zjjh123456
+      MYSQL_DATABASE: zhangjian_jianghu
+      MYSQL_CHARSET: utf8mb4
+      MYSQL_COLLATION: utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/data.sql:/docker-entrypoint-initdb.d/02-data.sql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    networks:
+      - zjjh-net
+
+  redis:
+    image: redis:7-alpine
+    container_name: zjjh-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - zjjh-net
+
+volumes:
+  mysql-data:
+  redis-data:
+
+networks:
+  zjjh-net:
+    driver: bridge
