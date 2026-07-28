@@ -1,6 +1,7 @@
 package com.zjjh.mud.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -14,6 +15,7 @@ public class Thing {
     private String fontName;
     private Long weight;
     private Long price;
+    @TableField("`describe`")
     private String describe;
     private String quantifier;
     private Integer thingType;

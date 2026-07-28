@@ -71,6 +71,7 @@ public class GameWebSocketController {
 
         // 更新玩家数据(命令可能修改了属性)
         gameEngine.getPlayerManager().updateOnlinePlayer(onlinePlayer);
+        log.info("[命令完成] player={}, cmd={}", onlinePlayer.getName(), command);
     }
 
     /**

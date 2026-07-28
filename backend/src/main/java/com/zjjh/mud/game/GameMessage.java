@@ -21,6 +21,7 @@ public class GameMessage {
         ACTOR_DIE,      // 人物死亡
         ACTOR_SAY,      // 人物说话
         ACTOR_PIC,      // 人物头像变化
+        CLEAR_ACTORS,   // 清除所有人物(切换房间时)
         HP_UPDATE,      // 气血更新
         SKILLS_UPDATE,  // 技能更新
         SCORE_UPDATE,   // 状态更新

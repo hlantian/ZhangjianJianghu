@@ -1,16 +1,26 @@
 package com.zjjh.mud.game;
 
-import lombok.RequiredArgsConstructor;
+import com.zjjh.mud.entity.Player;
+import com.zjjh.mud.game.engine.PlayerManager;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class GameMessageService {
 
     private final SimpMessagingTemplate messagingTemplate;
+    private final PlayerManager playerManager;
+
+    @Autowired
+    public GameMessageService(SimpMessagingTemplate messagingTemplate,
+                               @Lazy PlayerManager playerManager) {
+        this.messagingTemplate = messagingTemplate;
+        this.playerManager = playerManager;
+    }
 
     private static final String PLAYER_QUEUE = "/queue/messages";
     private static final String ROOM_TOPIC = "/topic/room/";
@@ -19,10 +29,17 @@ public class GameMessageService {
 
     /**
      * 向指定玩家推送消息
+     * 注意: WebSocket会话用userId标识用户(StompPrincipal.getName()=userId)
+     * 所以此处需将playerId转换为userId
      */
     public void sendToPlayer(Long playerId, GameMessage message) {
+        Player player = playerManager.getOnlinePlayer(playerId);
+        Long userId = (player != null && player.getUserId() != null) ? player.getUserId() : playerId;
+        log.info("[推送->玩家] playerId={}, userId={}, type={}, content={}",
+                playerId, userId, message.getType(),
+                message.getContent() != null ? (message.getContent().length() > 100 ? message.getContent().substring(0,100)+"..." : message.getContent()) : "null");
         messagingTemplate.convertAndSendToUser(
-                String.valueOf(playerId),
+                String.valueOf(userId),
                 PLAYER_QUEUE,
                 message
         );
@@ -39,6 +56,9 @@ public class GameMessageService {
      * 向房间内所有玩家广播消息
      */
     public void sendToRoom(Long roomId, GameMessage message) {
+        log.info("[广播->房间{}] type={}, content={}",
+                roomId, message.getType(),
+                message.getContent() != null ? (message.getContent().length() > 100 ? message.getContent().substring(0,100)+"..." : message.getContent()) : "null");
         messagingTemplate.convertAndSend(ROOM_TOPIC + roomId, message);
     }
 
@@ -53,6 +73,8 @@ public class GameMessageService {
      * 向聊天频道广播消息
      */
     public void sendToChatChannel(String channel, GameMessage message) {
+        log.info("[广播->频道{}] sender={}, content={}",
+                channel, message.getActorName(), message.getContent());
         messagingTemplate.convertAndSend(CHAT_TOPIC + channel, message);
     }
 

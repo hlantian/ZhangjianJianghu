@@ -64,6 +64,10 @@ public class GoCommand implements CommandHandler {
         PlayerManager playerManager = engine.getPlayerManager();
         playerManager.movePlayerToRoom(player.getId(), targetRoomId);
 
+        // 清除旧房间的角色头像
+        GameMessage clearMsg = new GameMessage(GameMessage.MessageType.CLEAR_ACTORS, null);
+        engine.getMessageService().sendToPlayer(player.getId(), clearMsg);
+
         // 显示新房间信息
         Room room = roomManager.getRoom(targetRoomId);
         if (room != null) {
@@ -75,24 +79,46 @@ public class GoCommand implements CommandHandler {
         String desc = roomManager.getRoomDescription(targetRoomId);
         engine.getMessageService().sendToPlayer(player.getId(), GameMessage.info(desc));
 
-        // 显示房间内人物
+        // 发送玩家自己的头像
+        GameMessage selfMsg = new GameMessage(GameMessage.MessageType.ACTOR_ENTER, null);
+        selfMsg.setActorName(player.getName());
+        selfMsg.setActorDisplayName(player.getName() + "(你)");
+        selfMsg.setX(player.getPlayerX());
+        selfMsg.setY(player.getPlayerY());
+        engine.getMessageService().sendToPlayer(player.getId(), selfMsg);
+
+        // 显示房间内人物 + 发送头像
         var players = playerManager.getOnlinePlayersInRoom(targetRoomId);
         if (players.size() > 1) {
             StringBuilder sb = new StringBuilder("房间里还有：");
             for (var p : players) {
                 if (!p.getId().equals(player.getId())) {
                     sb.append(p.getName()).append(" ");
+                    // 发送其他玩家头像
+                    GameMessage pMsg = new GameMessage(GameMessage.MessageType.ACTOR_ENTER, null);
+                    pMsg.setActorName(p.getName());
+                    pMsg.setActorDisplayName(p.getName());
+                    pMsg.setX(p.getPlayerX());
+                    pMsg.setY(p.getPlayerY());
+                    engine.getMessageService().sendToPlayer(player.getId(), pMsg);
                 }
             }
             engine.getMessageService().sendToPlayer(player.getId(), GameMessage.info(sb.toString()));
         }
 
-        // 显示NPC
+        // 显示NPC + 发送头像
         var npcs = roomManager.getRoomNpcs(targetRoomId);
         if (!npcs.isEmpty()) {
             StringBuilder sb = new StringBuilder("这里有：");
             for (var npc : npcs) {
                 sb.append(npc.getName()).append(" ");
+                // 发送NPC头像
+                GameMessage npcMsg = new GameMessage(GameMessage.MessageType.ACTOR_ENTER, null);
+                npcMsg.setActorName(npc.getName());
+                npcMsg.setActorDisplayName(npc.getName());
+                npcMsg.setX(100 + npcs.indexOf(npc) * 50);
+                npcMsg.setY(150);
+                engine.getMessageService().sendToPlayer(player.getId(), npcMsg);
             }
             engine.getMessageService().sendToPlayer(player.getId(), GameMessage.info(sb.toString()));
         }

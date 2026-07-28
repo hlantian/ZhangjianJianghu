@@ -10,7 +10,7 @@
         <a @click="sendCmd('inventory')">物品</a>
         <a @click="sendCmd('skills')">武功</a>
         <a @click="goRankings">排行榜</a>
-        <a @click="sendCmd('quit')">退出</a>
+        <a @click="handleQuit">退出</a>
       </div>
     </div>
 
@@ -36,8 +36,10 @@
             }"
           >
             <div style="text-align: center;">
-              <div style="font-size: 11px; color: #003300;">{{ actor.displayName }}</div>
-              <img :src="getActorImage(actor)" width="38" height="39" />
+              <div style="font-size: 11px; color: #003300; margin-bottom: 2px;">{{ actor.displayName }}</div>
+              <div class="actor-avatar" :style="{ background: getActorColor(actor) }">
+                {{ getActorEmoji(actor) }}
+              </div>
             </div>
           </div>
         </div>
@@ -238,9 +240,21 @@ function handleCanvasClick(event: MouseEvent) {
   gameStore.sendCommand(`move ${x} ${y}`)
 }
 
-function getActorImage(actor: any) {
-  // 根据actor类型返回图片
-  return '/images/man1.gif'
+function getActorColor(actor: any) {
+  // 根据名称hash生成颜色
+  const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8', '#F7DC6F']
+  const hash = (actor.name || '').charCodeAt(0) % colors.length
+  return colors[hash]
+}
+
+function getActorEmoji(actor: any) {
+  // 名字带"(你)"的是玩家自己
+  if (actor.displayName && actor.displayName.includes('(你)')) {
+    return '🧑'
+  }
+  // 名字不带"(你)"的可能是其他玩家或NPC
+  // 简单区分：名字长度<=2且不含称号的可能是NPC
+  return '🧑'
 }
 
 function formatMessage(msg: any) {
@@ -253,6 +267,14 @@ function formatMessage(msg: any) {
 
 function goRankings() {
   router.push('/rankings')
+}
+
+function handleQuit() {
+  gameStore.sendCommand('quit')
+  setTimeout(() => {
+    gameStore.disconnect()
+    authStore.logout()
+  }, 500)
 }
 
 // 自动滚动到底部
@@ -281,5 +303,16 @@ onUnmounted(() => {
 .actor-sprite {
   transition: all 0.3s ease;
   z-index: 5;
+}
+.actor-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  border: 2px solid #333;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 </style>

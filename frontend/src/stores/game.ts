@@ -58,7 +58,7 @@ export const useGameStore = defineStore('game', () => {
       onMessage: handleMessage,
       onConnect: () => {
         connected.value = true
-        gameWebSocket.subscribePlayer(authStore.playerId)
+        gameWebSocket.subscribePlayer(authStore.userId)
       },
       onDisconnect: () => {
         connected.value = false
@@ -127,12 +127,19 @@ export const useGameStore = defineStore('game', () => {
         break
 
       case 'ACTOR_ENTER':
-        actors.value.push({
-          name: actorName,
-          displayName: actorDisplayName || actorName,
-          x: x || 50,
-          y: y || 50
-        })
+        // 避免重复添加
+        if (!actors.value.find(a => a.name === actorName)) {
+          actors.value.push({
+            name: actorName,
+            displayName: actorDisplayName || actorName,
+            x: x || 50,
+            y: y || 50
+          })
+        }
+        break
+
+      case 'CLEAR_ACTORS':
+        actors.value = []
         break
 
       case 'ACTOR_LEAVE':

@@ -94,8 +94,9 @@ class GameWebSocket {
    */
   subscribePlayer(playerId: number) {
     if (this.stompClient && this.connected) {
-      // 订阅私人消息 (通过user destination)
-      const sub1 = this.stompClient.subscribe(`/user/${playerId}/queue/messages`, (message: any) => {
+      // 订阅私人消息 - Spring自动根据会话匹配，不需要在路径中指定userId
+      const sub1 = this.stompClient.subscribe('/user/queue/messages', (message: any) => {
+        console.log('[WS收到消息]', message.body)
         const msg = JSON.parse(message.body)
         this.callbacks.onMessage?.(msg)
       })
@@ -103,6 +104,7 @@ class GameWebSocket {
 
       // 订阅系统消息
       const sub2 = this.stompClient.subscribe('/topic/system', (message: any) => {
+        console.log('[WS收到系统消息]', message.body)
         const msg = JSON.parse(message.body)
         this.callbacks.onMessage?.(msg)
       })

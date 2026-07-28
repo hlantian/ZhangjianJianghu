@@ -62,8 +62,35 @@ public class LookCommand implements CommandHandler {
                         sb.append(" ").append(npc.getTitle());
                     }
                     sb.append("\n");
+                    // 直接发送NPC头像到玩家画布
+                    GameMessage npcMsg = new GameMessage(GameMessage.MessageType.ACTOR_ENTER, null);
+                    npcMsg.setActorName(npc.getName());
+                    npcMsg.setActorDisplayName(npc.getName());
+                    npcMsg.setX(100 + npcs.indexOf(npc) * 50);
+                    npcMsg.setY(150);
+                    engine.getMessageService().sendToPlayer(player.getId(), npcMsg);
                 }
                 engine.getMessageService().sendToPlayer(player.getId(), GameMessage.info(sb.toString()));
+            }
+
+            // 发送玩家自己的头像到画布
+            GameMessage selfMsg = new GameMessage(GameMessage.MessageType.ACTOR_ENTER, null);
+            selfMsg.setActorName(player.getName());
+            selfMsg.setActorDisplayName(player.getName() + "(你)");
+            selfMsg.setX(player.getPlayerX());
+            selfMsg.setY(player.getPlayerY());
+            engine.getMessageService().sendToPlayer(player.getId(), selfMsg);
+
+            // 发送房间内其他玩家头像到画布
+            for (var p : players) {
+                if (!p.getId().equals(player.getId())) {
+                    GameMessage pMsg = new GameMessage(GameMessage.MessageType.ACTOR_ENTER, null);
+                    pMsg.setActorName(p.getName());
+                    pMsg.setActorDisplayName(p.getName());
+                    pMsg.setX(p.getPlayerX());
+                    pMsg.setY(p.getPlayerY());
+                    engine.getMessageService().sendToPlayer(player.getId(), pMsg);
+                }
             }
         } else {
             // 查看指定目标(NPC或玩家)
